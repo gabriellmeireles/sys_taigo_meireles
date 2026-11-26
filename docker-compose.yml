@@ -62,6 +62,24 @@ services:
       - "${MAILPIT_UI_PORT:-8025}:8025"
       - "${MAILPIT_SMTP_PORT:-1025}:1025"
 
+  # Tradução automática (P-28). Carrega só PT, EN e ES para economizar memória.
+  # Os modelos são baixados na primeira vez e ficam no volume libretranslate-models.
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    environment:
+      LT_LOAD_ONLY: pt,en,es
+      LT_DISABLE_WEB_UI: "true"
+      LT_UPDATE_MODELS: "true"
+    ports:
+      - "${LIBRETRANSLATE_PORT:-5000}:5000"
+    volumes:
+      - libretranslate-models:/home/libretranslate/.local
+    healthcheck:
+      test: ["CMD-SHELL", "./venv/bin/python scripts/healthcheck.py"]
+      interval: 15s
+      timeout: 10s
+      retries: 40
+
   site:
     build: ./docker/node
     command: ["npx", "ng", "serve", "site", "--host", "0.0.0.0", "--port", "4200"]
@@ -88,3 +106,4 @@ services:
 
 volumes:
   db-data:
+  libretranslate-models:

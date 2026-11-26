@@ -29,6 +29,7 @@ docker compose run --rm api php artisan migrate --seed   # cria as tabelas (prim
 | API Laravel (nginx + PHP-FPM) | http://localhost:8000 (saúde: `/up`) |
 | Mailpit (e-mails capturados) | http://localhost:8025 |
 | MySQL 8.4 | `localhost:3307` (usuário/senha/banco em `.env`) |
+| LibreTranslate (tradução automática, só PT/EN/ES) | http://localhost:5000 (a primeira subida baixa os modelos) |
 
 Administrador de teste (só em `local`): ver `backend/database/seeders/DevAdminSeeder.php`.
 

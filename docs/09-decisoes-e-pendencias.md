@@ -54,7 +54,7 @@ Registradas no documento compartilhado e refletidas nos demais arquivos.
 | P-25 | Textos jurídicos fornecidos por advogado |
 | P-26 | Sem banner de cookies |
 | P-27 | `www`, `admin.`, `api.` |
-| P-28 | **Decidir depois** (e-mail, tradução, Instagram, geolocalização, anti-spam) |
+| P-28 | **Tradução: LibreTranslate** auto-hospedado (código aberto, sem custo), atrás da interface `TranslationProvider` para poder trocar depois. Nomes de categorias, técnicas e séries são traduzidos à mão (sem glossário no LibreTranslate). E-mail, Instagram, geolocalização e anti-spam: **decidir depois** |
 | P-29 | CDN no futuro |
 | P-30 | JPG, PNG, TIFF, WebP até 30 MB por arquivo |
 | P-31 | Ordem manual, ano decrescente como reserva |
