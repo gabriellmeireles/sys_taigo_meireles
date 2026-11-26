@@ -268,7 +268,7 @@ Globais: `site_setting_translations.seo_title_suffix`, `default_seo_description`
 | `browser_language` | Código de 2 letras |
 | `analytics_events` | Bruto pseudonimizado, apagado após `analytics_raw_retention_days` (sugestão: 90) |
 | `analytics_daily_*` | **Agregados** sem nenhum identificador; mantidos indefinidamente |
-| `contact_messages` | Único dado pessoal do sistema (fornecido voluntariamente); exclusão definitiva pelo painel; retenção configurável |
+| `contact_messages` | Único dado pessoal do sistema (fornecido voluntariamente); exclusão definitiva pelo painel; excluída automaticamente após 24 meses (`message_retention_days = 730`, P-20) |
 
 **Como cada indicador do dashboard sai do banco:**
 | Indicador | Fonte |

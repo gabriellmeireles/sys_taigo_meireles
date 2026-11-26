@@ -361,5 +361,5 @@ Segredos nunca versionados nem expostos no painel.
 - HTTPS obrigatório, HSTS, cabeçalhos de segurança (CSP com `youtube-nocookie.com` e domínios do Instagram liberados), CORS restrito às origens do site e painel.
 - Sanitização do HTML do editor de texto rico (lista de tags permitidas).
 - Validação de upload por conteúdo real (MIME), não pela extensão; limite de tamanho; nome de arquivo gerado (UUID).
-- Mensagens de contato: dados pessoais mínimos (nome, e-mail, telefone, texto); exclusão definitiva pelo painel; retenção sugerida configurável (P-20).
+- Mensagens de contato: dados pessoais mínimos (nome, e-mail, telefone, texto); exclusão definitiva pelo painel a qualquer momento; exclusão automática após 24 meses por tarefa agendada diária (P-20, configurável em `site_settings.message_retention_days`).
 - LGPD/GDPR: política de privacidade descrevendo tratamento; métricas sem cookies e sem IP armazenado.

@@ -46,7 +46,7 @@ Registradas no documento compartilhado e refletidas nos demais arquivos.
 | P-17 | `America/Sao_Paulo` |
 | P-18 | Soma dos únicos diários, rotulada |
 | P-19 | Base local gratuita de geolocalização |
-| P-20 | **Em aberto**: definir prazo ou manter exclusão manual |
+| P-20 | **24 meses**: mensagens mais antigas são excluídas automaticamente (tarefa diária); os administradores também podem excluir manualmente a qualquer momento. Padrão `site_settings.message_retention_days = 730` |
 | P-21 | Começar sem fornecedor de anti-spam |
 | P-22 | Cópia local só se os termos da Meta permitirem |
 | P-23 | Dimensões só em centímetros |
@@ -102,7 +102,6 @@ Checkout, pagamento online, pedidos, contas/área de colecionadores, newsletter 
 
 ## 10.5 Próximos passos sugeridos
 1. Escolher a hospedagem de produção (P-15), com PHP 8.4 e MySQL 8.0.16 ou superior.
-2. Definir o prazo de retenção das mensagens (P-20).
-3. Produzir protótipo visual de alta fidelidade das telas-chave (Início, Galeria, Obra, Contato, Dashboard, Editor de obra) a partir deste design system.
-4. Converter `backend/database/sql/schema_v1.sql` em migrações do Laravel e validar em MySQL da versão contratada.
-5. Escolher provedores de e-mail e tradução (necessários desde o primeiro dia).
+2. Escolher o fornecedor de envio de e-mail (P-28) antes da publicação.
+3. Desenvolver a V1 a partir da base da API e do login do painel (ambiente Docker pronto; banco validado no MySQL 8.4).
+4. Opcional: protótipo visual de alta fidelidade das telas-chave (Início, Galeria, Obra, Contato, Dashboard, Editor de obra).
