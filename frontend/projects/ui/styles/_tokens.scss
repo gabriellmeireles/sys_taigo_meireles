@@ -1,0 +1,107 @@
+// Tokens do design system (docs/04-design-system.md §5.1–5.5).
+// Expostos como variáveis CSS para site e painel.
+
+:root {
+  // Cores (paleta do cliente)
+  --color-ink: #000000;
+  --color-charcoal: #262626;
+  --color-graphite: #6f6d6e;
+  --color-stone: #ccc6c3;
+  --color-mist: #e7e3e2;
+  --color-paper: #ffffff;
+  // Cor funcional de erro aprovada como opção (P-02)
+  --color-error: #8a2c2c;
+
+  // Papéis
+  --text: var(--color-charcoal);
+  --text-muted: var(--color-graphite);
+  --surface: var(--color-paper);
+  --surface-alt: var(--color-mist);
+  --surface-dark: var(--color-charcoal);
+  --border-decor: var(--color-stone);
+  --border-control: var(--color-graphite);
+  --focus: var(--color-ink);
+
+  // Tipografia
+  --font-title: 'Cinzel', 'Times New Roman', serif;
+  --font-text: 'Open Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --fs-display: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
+  --fs-h1: clamp(2rem, 1.4rem + 2.4vw, 3.5rem);
+  --fs-h2: clamp(1.625rem, 1.25rem + 1.5vw, 2.5rem);
+  --fs-h3: clamp(1.25rem, 1.05rem + 0.8vw, 1.75rem);
+  --fs-h4: clamp(1.0625rem, 1rem + 0.25vw, 1.25rem);
+  --fs-body-lg: clamp(1.125rem, 1.08rem + 0.2vw, 1.25rem);
+  --fs-body: clamp(1rem, 0.98rem + 0.1vw, 1.0625rem);
+  --fs-body-sm: 0.875rem;
+  --fs-caption: 0.8125rem;
+  --fs-eyebrow: 0.75rem;
+  --fs-button: 0.8125rem;
+  --fs-numeric: clamp(1.75rem, 1.5rem + 1vw, 2.25rem);
+
+  --tracking-title: 0.06em;
+  --tracking-eyebrow: 0.18em;
+  --tracking-button: 0.14em;
+
+  // Espaçamento (base 4px)
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+  --space-11: 160px;
+
+  // Grid (mobile first; ver _layout.scss)
+  --grid-columns: 4;
+  --grid-gutter: 16px;
+  --page-margin: 20px;
+  --content-max: 1440px;
+  --section-gap: var(--space-8);
+
+  // Forma e movimento
+  --radius: 0;
+  --control-height: 48px;
+  --touch-target: 44px;
+  --focus-ring: 2px solid var(--focus);
+  --focus-offset: 3px;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 400ms;
+  --shadow-overlay: 0 8px 32px rgb(0 0 0 / 12%);
+
+  @media (min-width: 600px) {
+    --page-margin: 32px;
+  }
+
+  @media (min-width: 768px) {
+    --grid-columns: 8;
+    --grid-gutter: 24px;
+    --page-margin: 40px;
+    --section-gap: var(--space-9);
+  }
+
+  @media (min-width: 1024px) {
+    --grid-columns: 12;
+    --page-margin: 48px;
+  }
+
+  @media (min-width: 1280px) {
+    --grid-gutter: 32px;
+    --page-margin: 64px;
+    --section-gap: var(--space-10);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 100ms;
+    --dur-base: 100ms;
+    --dur-slow: 100ms;
+  }
+}

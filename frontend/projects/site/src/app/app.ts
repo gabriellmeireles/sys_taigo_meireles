@@ -1,12 +1,17 @@
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { UiToastOutlet } from '@tm/ui';
 
 @Component({
-  imports: [RouterOutlet],
   selector: 'tm-root',
-  styleUrl: './app.scss',
-  templateUrl: './app.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterOutlet, UiToastOutlet],
+  template: `
+    <a class="ui-skip-link" href="#conteudo">Ir para o conteúdo</a>
+    <main id="conteudo" tabindex="-1">
+      <router-outlet />
+    </main>
+    <ui-toast-outlet />
+  `,
 })
-export class App {
-  protected readonly title = signal('site');
-}
+export class App {}

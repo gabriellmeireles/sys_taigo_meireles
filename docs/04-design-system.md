@@ -150,3 +150,51 @@ Estados: **hover** (primary → `#262626`; secondary → fundo `#000` texto `#FF
 }
 ```
 Sugestão: publicar os tokens e componentes como **biblioteca Angular compartilhada** no mesmo workspace dos dois apps (ver arquitetura §6.3).
+
+## 5.10 Implementação (etapa 2)
+
+A biblioteca `frontend/projects/ui` (importada como `@tm/ui`) implementa este design system:
+
+| Parte | Onde |
+|---|---|
+| Tokens (variáveis CSS), base, tipografia, grid, botões, formulários e estilos dos componentes | `projects/ui/styles/*.scss`, incluídos no `angular.json` de cada app |
+| Fontes Cinzel 400 e Open Sans 400 (painel também 600), hospedadas no próprio projeto, subconjunto latino | pacotes `@fontsource/*`, sem chamadas a terceiros |
+| `uiButton` (primary, secondary, inverse, link, channel; carregando; desabilitado) | `lib/button` |
+| `ui-form-field` + `uiInput` (rótulo, ajuda, erro, obrigatório; liga `id`, `aria-describedby`, `aria-invalid`) | `lib/form-field` |
+| `ui-status-badge`, `ui-translation-badge`, `ui-chip` | `lib/badges` |
+| `ui-artwork-card` (moldura 4:5, obra contida, status, preço) | `lib/artwork-card` |
+| `ui-skeleton`, `ui-progress`, `ui-state` (vazio, erro, sucesso), `ui-section-heading`, `ui-kpi-tile` | `lib/feedback` |
+| `ToastService` + `ui-toast-outlet` (status/alert para leitores de tela) | `lib/toast` |
+| `ui-confirm-dialog` (sobre `<dialog>` nativo) | `lib/dialog` |
+| `formatPrice`, `displayPrice` (moeda por idioma e regras da §7.5) | `lib/pricing` |
+| `ui-logo` (marca: horizontal, assinatura, selo, mão) | `lib/logo` + `projects/ui/brand/*.svg` |
+
+## 5.11 Marca (manual da marca)
+
+O manual confirma a paleta (§5.1, com valores CMYK para impressos) e a tipografia: **Cinzel** principal, **Open Sans** de apoio.
+
+**Formas da marca** — SVGs vetoriais em `frontend/projects/ui/brand`, extraídos do PDF de variações do logotipo (o `.ai` foi salvo sem compatibilidade com PDF). Gerados por `scripts/brand/build-brand-assets.sh`, que também cria o favicon e os ícones.
+
+| Forma | Arquivo | Uso no site e no painel |
+|---|---|---|
+| Horizontal (mão + nome) | `horizontal.svg` | Cabeçalho do site; menu lateral do painel |
+| Assinatura (mão sobre o nome) | `assinatura.svg` | Rodapé; telas de destaque |
+| Selo circular | `selo.svg` | Login do painel; imagem padrão de compartilhamento; rodapé |
+| Mão ("elemento associativo") | `mao.svg` | Favicon, ícone de celular, 404, carregamento inicial |
+
+**Cor**: os SVGs são de uma cor só e o componente usa a cor do texto (`currentColor`). Combinações do manual:
+
+| Versão | Fundo | Marca |
+|---|---|---|
+| I (principal) | `#262626` | clara |
+| II | `#6F6D6E` | clara |
+| III | `#CCC6C3` | escura |
+| IV | `#E7E3E2` | grafite |
+| Monocromática I | `#FFFFFF` | preta |
+| Monocromática II | `#000000` | branca |
+
+**Regras**: a marca nunca vai sobre fotos de obras (requisito de não usar marca d'água); não distorcer, girar, aplicar sombra ou outras cores além da paleta; manter respiro de pelo menos a altura da letra "T" do nome em volta da marca.
+
+**Ícones**: `favicon.svg` (mão em `#262626`, branca em tema escuro do navegador), `favicon.ico` (16/32/48), `apple-touch-icon.png` (180) e `icon-512.png` (mão branca sobre `#262626`).
+
+Vitrine para revisão visual: `http://localhost:4200/design-system` (provisória; sai do site antes da publicação). Classes utilitárias: `ui-container`, `ui-grid`, `ui-section`, `ui-stack`, `ui-cluster`, `ui-artwork-grid`, `ui-eyebrow`, `ui-display`, `ui-prose`, `ui-on-dark`, `ui-visually-hidden`, `ui-skip-link`, `ui-check`, `ui-switch`.

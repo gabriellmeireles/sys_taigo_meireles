@@ -44,7 +44,11 @@ bash scripts/smoke-db.sh                                 # testa as regras do ba
 bash scripts/smoke-up.sh                                 # sobe tudo e confere se cada serviço responde
 bash scripts/test.sh                                     # testes automatizados do backend (banco taigo_test)
 bash scripts/smoke-auth.sh                               # login do painel ponta a ponta (CSRF, sessão, CORS, e-mail)
+bash scripts/test-frontend.sh                            # testes (Vitest) de ui, site e admin + build de produção
+bash scripts/restart-frontend.sh                         # reinicia o ng serve (após mudar angular.json ou pacotes)
 ```
+
+Design system: biblioteca `@tm/ui` em `frontend/projects/ui`; vitrine em http://localhost:4200/design-system (ver `docs/04-design-system.md` §5.10).
 
 Na primeira vez com um volume do MySQL que já existia, crie o banco de testes: `bash scripts/create-test-db.sh`.
 

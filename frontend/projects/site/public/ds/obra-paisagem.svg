@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <!-- Imagem de exemplo para a vitrine do design system (não é obra real) -->
+  <rect width="1200" height="800" fill="#e9e2d6"/>
+  <rect x="0" y="0" width="1200" height="430" fill="#9fb3bf"/>
+  <path d="M0 430 C 300 360, 700 500, 1200 400 L1200 800 L0 800 Z" fill="#3d5260"/>
+  <path d="M0 560 C 400 500, 800 640, 1200 560 L1200 800 L0 800 Z" fill="#1f2a31"/>
+  <circle cx="900" cy="190" r="70" fill="#f2efe8"/>
+</svg>

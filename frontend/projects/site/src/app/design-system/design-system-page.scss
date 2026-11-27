@@ -1,0 +1,129 @@
+.ds-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-block: var(--space-9) var(--space-6);
+}
+
+.ds-title .ui-logo {
+  width: min(100%, 520px);
+}
+
+.ds-brand-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-7);
+}
+
+.ds-brand-backgrounds {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-7) 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-3);
+    border: 1px solid var(--border-decor);
+  }
+
+  .ui-logo {
+    width: 96px;
+  }
+}
+
+.ds-section {
+  border-top: 1px solid var(--border-decor);
+}
+
+.ds-row {
+  margin-top: var(--space-6);
+}
+
+.ds-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+}
+
+.ds-swatch {
+  height: 96px;
+  border: 1px solid var(--border-decor);
+}
+
+.ds-swatch__name {
+  font-family: var(--font-title);
+  letter-spacing: 0.08em;
+}
+
+.ds-dark {
+  margin-top: var(--space-5);
+  padding: var(--space-6);
+}
+
+.ds-form {
+  max-width: 560px;
+}
+
+.ds-table-wrap {
+  overflow-x: auto;
+}
+
+.ds-table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  font-size: var(--fs-body-sm);
+
+  th,
+  td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-decor);
+    text-align: left;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  thead th {
+    font-size: var(--fs-eyebrow);
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+}
+
+.ds-states {
+  display: grid;
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  ui-state {
+    border: 1px solid var(--border-decor);
+    padding-block: var(--space-7);
+  }
+}
+
+.ds-kpis {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}

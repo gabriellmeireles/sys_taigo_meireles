@@ -1,0 +1,165 @@
+// Campos de formulário (componente ui-form-field + diretiva uiInput).
+
+.ui-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ui-field__label {
+  font-size: var(--fs-body-sm);
+  color: var(--text);
+}
+
+.ui-field__required {
+  margin-left: 2px;
+}
+
+.ui-field__hint {
+  font-size: var(--fs-body-sm);
+  color: var(--text-muted);
+}
+
+.ui-field__error {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  font-size: var(--fs-body-sm);
+  color: var(--color-error);
+
+  &::before {
+    content: '⚠';
+    line-height: 1.4;
+  }
+}
+
+.ui-input {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius);
+  background: var(--color-paper);
+  color: var(--color-charcoal);
+  transition: border-color var(--dur-fast) var(--ease);
+
+  &::placeholder {
+    color: var(--color-graphite);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--color-ink);
+    box-shadow: inset 0 0 0 1px var(--color-ink);
+  }
+
+  &[aria-invalid='true'] {
+    border-color: var(--color-error);
+    box-shadow: inset 0 0 0 1px var(--color-error);
+  }
+
+  &:disabled {
+    background: var(--color-mist);
+    color: var(--color-graphite);
+  }
+
+  &[readonly] {
+    border-color: transparent;
+    background: var(--color-mist);
+  }
+}
+
+textarea.ui-input {
+  min-height: calc(5 * 1.65em + 2 * var(--space-3));
+  padding-block: var(--space-3);
+  resize: vertical;
+}
+
+select.ui-input {
+  appearance: none;
+  padding-right: var(--space-7);
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 22px) 50%, calc(100% - 16px) 50%;
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+}
+
+// Caixa de seleção e opção única
+.ui-check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--touch-target);
+  cursor: pointer;
+
+  input {
+    appearance: none;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    border: 1px solid var(--color-charcoal);
+    background: var(--color-paper);
+    display: grid;
+    place-content: center;
+
+    &[type='radio'] {
+      border-radius: 50%;
+    }
+
+    &:checked {
+      background: var(--color-ink);
+      border-color: var(--color-ink);
+      box-shadow: inset 0 0 0 3px var(--color-paper);
+    }
+  }
+}
+
+// Interruptor (painel)
+.ui-switch {
+  appearance: none;
+  position: relative;
+  width: 40px;
+  height: 22px;
+  margin: 0;
+  border: 1px solid var(--color-graphite);
+  border-radius: 11px;
+  background: var(--color-paper);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease);
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-graphite);
+    transition: transform var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease);
+  }
+
+  &:checked {
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+
+    &::after {
+      transform: translateX(18px);
+      background: var(--color-paper);
+    }
+  }
+}
+
+// Resumo de erros no topo do formulário
+.ui-error-summary {
+  padding: var(--space-4) var(--space-5);
+  border-left: 2px solid var(--color-error);
+  background: var(--color-mist);
+
+  ul {
+    margin: var(--space-2) 0 0;
+    padding-left: var(--space-5);
+  }
+}

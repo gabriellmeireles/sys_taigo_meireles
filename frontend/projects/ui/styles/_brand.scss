@@ -1,0 +1,23 @@
+// Marca (componente ui-logo). Os SVGs em projects/ui/brand são máscaras: a cor vem do texto.
+
+.ui-logo {
+  display: inline-block;
+  flex: none;
+  background-color: currentColor;
+  -webkit-mask: var(--ui-logo-src) center / contain no-repeat;
+  mask: var(--ui-logo-src) center / contain no-repeat;
+}
+
+// Proporções das artes originais; a largura padrão pode ser trocada com width/height.
+.ui-logo--horizontal { aspect-ratio: 707 / 130; width: 200px; }
+.ui-logo--assinatura { aspect-ratio: 676 / 232; width: 220px; }
+.ui-logo--selo { aspect-ratio: 1; width: 120px; }
+.ui-logo--mao { aspect-ratio: 361 / 512; width: 40px; }
+
+// Alto contraste do Windows: sem isso o fundo forçado esconderia a marca.
+@media (forced-colors: active) {
+  .ui-logo {
+    forced-color-adjust: none;
+    background-color: CanvasText;
+  }
+}

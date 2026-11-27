@@ -1,0 +1,37 @@
+// Classes tipográficas (docs/04-design-system.md §5.2).
+
+.ui-display {
+  font-family: var(--font-title);
+  font-size: var(--fs-display);
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+}
+
+.ui-eyebrow {
+  font-family: var(--font-text);
+  font-size: var(--fs-eyebrow);
+  line-height: 1.4;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ui-body-lg { font-size: var(--fs-body-lg); line-height: 1.7; }
+.ui-body-sm { font-size: var(--fs-body-sm); line-height: 1.55; letter-spacing: 0.01em; }
+.ui-caption { font-size: var(--fs-caption); line-height: 1.5; letter-spacing: 0.02em; color: var(--text-muted); }
+.ui-muted { color: var(--text-muted); }
+
+.ui-numeric {
+  font-size: var(--fs-numeric);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+// Texto corrido: 60–72 caracteres por linha
+.ui-prose {
+  max-width: 68ch;
+
+  > * + * {
+    margin-top: 1em;
+  }
+}

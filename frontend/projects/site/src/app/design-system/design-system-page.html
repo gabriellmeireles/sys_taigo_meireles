@@ -1,0 +1,218 @@
+<div class="ui-container">
+  <header class="ds-hero">
+    <span class="ui-eyebrow">Design system</span>
+    <h1 class="ds-title"><ui-logo variant="horizontal" label="Taigo Meireles — design system" /></h1>
+    <p class="ui-body-lg ui-muted">Tokens, tipografia e componentes do site e do painel. Página de referência para desenvolvimento.</p>
+  </header>
+
+  <!-- Marca -->
+  <section class="ui-section ds-section">
+    <ui-section-heading eyebrow="Manual da marca" title="Marca" />
+    <div class="ds-brand-row">
+      <ui-logo variant="horizontal" />
+      <ui-logo variant="assinatura" />
+      <ui-logo variant="selo" />
+      <ui-logo variant="mao" />
+    </div>
+    <ul class="ds-brand-backgrounds">
+      @for (bg of brandBackgrounds; track bg.name) {
+        <li [style.background]="bg.hex" [style.color]="bg.ink">
+          <ui-logo variant="selo" />
+          <span class="ui-caption" [style.color]="bg.ink">{{ bg.name }} · {{ bg.hex }}</span>
+        </li>
+      }
+    </ul>
+    <p class="ui-caption ds-row">A marca usa a cor do texto (currentColor). Nunca aparece sobre fotos de obras.</p>
+  </section>
+
+  <!-- Cores -->
+  <section class="ui-section ds-section" aria-labelledby="ds-cores">
+    <ui-section-heading eyebrow="5.1" title="Cores" />
+    <ul class="ds-swatches">
+      @for (c of colors; track c.hex) {
+        <li>
+          <span class="ds-swatch" [style.background]="c.hex"></span>
+          <span class="ds-swatch__name">{{ c.name }}</span>
+          <span class="ui-caption">{{ c.hex }} · {{ c.use }}</span>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <!-- Tipografia -->
+  <section class="ui-section ds-section">
+    <ui-section-heading eyebrow="5.2" title="Tipografia" />
+    <div class="ui-stack" style="--stack-gap: var(--space-5)">
+      <p class="ui-display">Manifesto em Cinzel</p>
+      <h1>Título de página</h1>
+      <h2>Título de obra · Horizonte II</h2>
+      <h3>Subseção</h3>
+      <h4>Título em card</h4>
+      <span class="ui-eyebrow">Eyebrow · rótulo de seção</span>
+      <p class="ui-body-lg ui-prose">A pintura nasce do silêncio do ateliê: camadas finas de óleo, sobrepostas ao longo de semanas, até que a luz encontre o seu lugar.</p>
+      <p class="ui-prose">Texto corrido em Open Sans Regular, com 60 a 72 caracteres por linha. A hierarquia vem do tamanho, da cor e do espaçamento, sem negrito.</p>
+      <p class="ui-body-sm">Ficha técnica · Óleo sobre tela · 120 × 90 cm</p>
+      <p class="ui-caption">Legenda de imagem</p>
+    </div>
+  </section>
+
+  <!-- Botões -->
+  <section class="ui-section ds-section">
+    <ui-section-heading eyebrow="5.7" title="Botões" />
+    <div class="ui-cluster">
+      <button uiButton="primary" type="button">Consultar pelo WhatsApp</button>
+      <button uiButton="secondary" type="button">Consultar pelo Instagram</button>
+      <button uiButton="primary" type="button" [loading]="sending()" (click)="send()">
+        {{ sending() ? 'Enviando…' : 'Enviar mensagem' }}
+      </button>
+      <button uiButton="primary" type="button" [disabled]="true">Desabilitado</button>
+      <a uiButton="link" href="#">Ver galeria →</a>
+    </div>
+    <div class="ui-on-dark ds-dark ui-cluster">
+      <button uiButton="inverse" type="button">WhatsApp</button>
+      <button uiButton="inverse" type="button">Instagram</button>
+      <a uiButton="link" href="#">Formulário →</a>
+    </div>
+  </section>
+
+  <!-- Formulários -->
+  <section class="ui-section ds-section">
+    <ui-section-heading eyebrow="5.7" title="Formulários" />
+    <form class="ds-form ui-stack" style="--stack-gap: var(--space-5)" (submit)="$event.preventDefault()">
+      <p class="ui-caption">* obrigatório</p>
+      <ui-form-field label="Nome" [required]="true">
+        <input uiInput type="text" autocomplete="name" />
+      </ui-form-field>
+      <ui-form-field label="E-mail" [required]="true" error="Informe um e-mail válido.">
+        <input uiInput type="email" value="maria@" autocomplete="email" />
+      </ui-form-field>
+      <ui-form-field label="Telefone" hint="Opcional. Com DDD.">
+        <input uiInput type="tel" autocomplete="tel" />
+      </ui-form-field>
+      <ui-form-field label="Técnica">
+        <select uiInput>
+          <option>Óleo sobre tela</option>
+          <option>Acrílica sobre tela</option>
+          <option>Técnica mista</option>
+        </select>
+      </ui-form-field>
+      <ui-form-field label="Mensagem" [required]="true">
+        <textarea uiInput></textarea>
+      </ui-form-field>
+      <div class="ui-cluster">
+        <label class="ui-check"><input type="checkbox" checked /> Disponível</label>
+        <label class="ui-check"><input type="radio" name="status" checked /> Reservada</label>
+        <label class="ui-check"><input type="radio" name="status" /> Vendida</label>
+        <label class="ui-check"><input class="ui-switch" type="checkbox" checked /> Exibir preço</label>
+      </div>
+    </form>
+  </section>
+
+  <!-- Indicadores -->
+  <section class="ui-section ds-section">
+    <ui-section-heading eyebrow="5.7" title="Indicadores" />
+    <div class="ui-cluster" style="--cluster-gap: var(--space-6)">
+      <ui-status-badge status="available" />
+      <ui-status-badge status="reserved" />
+      <ui-status-badge status="sold" />
+      <ui-status-badge status="available" label="Available" />
+    </div>
+    <div class="ui-cluster ds-row">
+      <ui-translation-badge state="manual" prefix="EN " />
+      <ui-translation-badge state="auto" prefix="ES " />
+      <ui-translation-badge state="outdated" prefix="EN " />
+      <ui-translation-badge state="missing" prefix="ES " />
+    </div>
+    <div class="ui-cluster ds-row">
+      @for (chip of chips(); track chip) {
+        <ui-chip (remove)="removeChip(chip)">{{ chip }}</ui-chip>
+      }
+    </div>
+  </section>
+
+  <!-- Cards de obra -->
+  <section class="ui-section ds-section">
+    <ui-section-heading eyebrow="Galeria" title="Cards de obra">
+      <a uiButton="link" href="#">Ver galeria →</a>
+    </ui-section-heading>
+    <div class="ui-artwork-grid">
+      <ui-artwork-card link="/design-system" title="Horizonte II" meta="2024 · Óleo sobre tela"
+        imageSrc="ds/obra-retrato.svg" imageAlt="Pintura vertical com sol alaranjado sobre azul profundo"
+        [imageWidth]="800" [imageHeight]="1000" status="available" price="R$ 18.000" [eager]="true" />
+      <ui-artwork-card link="/design-system" title="Maré" meta="2023 · Acrílica sobre tela"
+        imageSrc="ds/obra-paisagem.svg" imageAlt="Paisagem horizontal com colinas azuis"
+        [imageWidth]="1200" [imageHeight]="800" status="reserved" />
+      <ui-artwork-card link="/design-system" title="Planos de cor" meta="2022 · Técnica mista"
+        imageSrc="ds/obra-quadrada.svg" imageAlt="Composição de retângulos em ocre, branco e vermelho"
+        [imageWidth]="900" [imageHeight]="900" status="sold" frame="mist" />
+      <ui-artwork-card link="/design-system" title="Um título de obra bem mais longo para testar a quebra"
+        meta="2021 · Óleo sobre linho" imageSrc="ds/obra-retrato.svg" imageAlt=""
+        [imageWidth]="800" [imageHeight]="1000" status="available" />
+    </div>
+  </section>
+
+  <!-- Preço e moeda -->
+  <section class="ui-section ds-section">
+    <ui-section-heading eyebrow="7.5" title="Preço e moeda" />
+    <div class="ds-table-wrap">
+      <table class="ds-table">
+        <thead>
+          <tr><th scope="col">Situação</th>@for (l of locales; track l) {<th scope="col">{{ l }}</th>}</tr>
+        </thead>
+        <tbody>
+          @for (row of priceRows; track row.label) {
+            <tr>
+              <th scope="row">{{ row.label }}</th>
+              @for (l of locales; track l) {<td>{{ price(row.artwork, l) }}</td>}
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Carregando e estados -->
+  <section class="ui-section ds-section">
+    <ui-section-heading eyebrow="7.7" title="Carregando, vazio, erro e sucesso" />
+    <ui-progress />
+    <div class="ui-artwork-grid ds-row">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div><ui-skeleton shape="card" /><ui-skeleton [lines]="2" /></div>
+      }
+    </div>
+    <div class="ds-states">
+      <ui-state title="Nenhuma obra encontrada com esses filtros.">
+        <button uiButton="secondary" type="button">Limpar filtros</button>
+      </ui-state>
+      <ui-state kind="error" title="Não foi possível carregar as obras." message="Verifique a conexão ou fale direto com o ateliê.">
+        <button uiButton="primary" type="button">Tentar novamente</button>
+      </ui-state>
+      <ui-state kind="success" title="Mensagem enviada" message="Obrigado, Maria. Enviamos uma confirmação para maria@exemplo.com.">
+        <button uiButton="secondary" type="button">Ver obras disponíveis</button>
+      </ui-state>
+    </div>
+  </section>
+
+  <!-- Avisos e diálogo -->
+  <section class="ui-section ds-section">
+    <ui-section-heading eyebrow="Feedback" title="Avisos e confirmação" />
+    <div class="ui-cluster">
+      <button uiButton="secondary" type="button" (click)="send()">Mostrar aviso de sucesso</button>
+      <button uiButton="secondary" type="button" (click)="showError()">Mostrar aviso de erro</button>
+      <button uiButton="secondary" type="button" (click)="dialogOpen.set(true)">Excluir obra…</button>
+    </div>
+    <ui-confirm-dialog [open]="dialogOpen()" title="Excluir “Maré”?" message="Esta ação não pode ser desfeita."
+      confirmLabel="Excluir" (confirmed)="confirmDelete()" (closed)="dialogOpen.set(false)" />
+  </section>
+
+  <!-- Painel -->
+  <section class="ui-section ds-section">
+    <ui-section-heading eyebrow="Painel" title="Indicadores do dashboard" />
+    <div class="ds-kpis">
+      <ui-kpi-tile label="Acessos" value="12.480" [delta]="12" />
+      <ui-kpi-tile label="Visitantes únicos" value="4.902" [delta]="4.5" />
+      <ui-kpi-tile label="Mensagens" value="38" [delta]="-3" />
+      <ui-kpi-tile label="WhatsApp" value="214" />
+    </div>
+  </section>
+</div>
