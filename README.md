@@ -85,6 +85,19 @@ Sessão com cookie (Laravel Sanctum, modo SPA). O painel chama `GET /sanctum/csr
 
 **Obras de teste**: `bash scripts/import-dev-artworks.sh` importa `dev-data/series/<série>/<TÍTULO> - <altura>x<largura>cm - <ano>.jpg` (pasta fora do Git) com status e preços fictícios. `bash scripts/check-media.sh` resume as imagens processadas.
 
+## Painel (etapa 3b)
+
+http://localhost:4201 — entre com o administrador de teste (`backend/database/seeders/DevAdminSeeder.php`).
+
+| Rota | Tela |
+|---|---|
+| `/entrar` · `/esqueci-a-senha` · `/redefinir-senha` · `/definir-senha` | Login, pedido de link, nova senha (link do e-mail) e primeira senha (convite) |
+| `/obras` | Lista com busca, filtros por status e série, status editável na linha, miniatura e selos de tradução |
+| `/obras/nova` · `/obras/:id` | Editor: dados, textos por idioma (PT/EN/ES), imagens (arrastar e soltar, progresso, processamento, ordem, principal), vídeo, status e preço, SEO com prévia; aviso de alterações não salvas |
+| `/series` · `/tecnicas` · `/categorias` | Nome por idioma, ordem, exclusão bloqueada quando em uso |
+
+Os demais itens do menu aparecem como "em breve". A API fica em `environment.apiBaseUrl` (`frontend/projects/admin/src/environments/environment.ts`); o painel envia o cookie de sessão e o cabeçalho `X-XSRF-TOKEN` (interceptador em `core/api/api.interceptor.ts`).
+
 Limites do PHP no ambiente: upload 30 MB, memória 1024 MB, 60 s (`docker/php/php.ini`).
 
 ## Especificação (na ordem pedida)

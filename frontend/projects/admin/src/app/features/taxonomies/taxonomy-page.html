@@ -1,0 +1,94 @@
+<div class="adm-page-head">
+  <div class="ui-stack" style="--stack-gap: var(--space-2)">
+    <span class="ui-eyebrow">Conteúdo</span>
+    <h1>{{ title() }}</h1>
+  </div>
+  @if (!editing()) {
+    <button uiButton="primary" type="button" (click)="startNew()">+ {{ feminine() ? 'Nova' : 'Novo' }} {{ noun() }}</button>
+  }
+</div>
+
+@if (editing(); as current) {
+  <form class="adm-panel" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <h2>{{ current === 'new' ? (feminine() ? 'Nova ' : 'Novo ') + noun() : 'Editar ' + noun() }}</h2>
+    <div class="adm-fields adm-fields--3">
+      <ui-form-field #firstField label="Nome em português" [required]="true" [error]="nameError()">
+        <input uiInput type="text" formControlName="pt" maxlength="160" />
+      </ui-form-field>
+      <ui-form-field label="Nome em inglês" hint="Opcional. Sem ele, o site usa o português.">
+        <input uiInput type="text" formControlName="en" maxlength="160" />
+      </ui-form-field>
+      <ui-form-field label="Nome em espanhol" hint="Opcional.">
+        <input uiInput type="text" formControlName="es" maxlength="160" />
+      </ui-form-field>
+    </div>
+    <div class="ui-cluster" style="margin-top: var(--space-5); justify-content: flex-end">
+      <button uiButton="secondary" type="button" (click)="editing.set(null)">Cancelar</button>
+      <button uiButton="primary" type="submit" [loading]="saving()">{{ saving() ? 'Salvando…' : 'Salvar' }}</button>
+    </div>
+  </form>
+}
+
+<section class="adm-panel" [attr.aria-busy]="items() === null">
+  @if (loadError()) {
+    <ui-state kind="error" [title]="loadError()!">
+      <button uiButton="secondary" type="button" (click)="load()">Tentar novamente</button>
+    </ui-state>
+  } @else if (items() === null) {
+    <ui-skeleton shape="text" [lines]="5" />
+  } @else if (items()!.length === 0) {
+    <ui-state [title]="'Nenhuma ' + noun() + ' cadastrada.'">
+      <button uiButton="primary" type="button" (click)="startNew()">Cadastrar a primeira</button>
+    </ui-state>
+  } @else {
+    <table class="adm-table">
+      <caption class="ui-visually-hidden">{{ title() }} na ordem em que aparecem no site</caption>
+      <thead>
+        <tr>
+          <th scope="col">Nome</th>
+          <th scope="col">Traduções</th>
+          <th scope="col">Obras</th>
+          <th scope="col">Ordem</th>
+          <th scope="col"><span class="ui-visually-hidden">Ações</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of items(); track item.id; let i = $index, first = $first, last = $last) {
+          <tr>
+            <td>{{ item.name }}</td>
+            <td data-label="Traduções">
+              <span class="ui-cluster" style="--cluster-gap: var(--space-2)">
+                <ui-translation-badge [state]="item.translation_states.en" prefix="EN " />
+                <ui-translation-badge [state]="item.translation_states.es" prefix="ES " />
+              </span>
+            </td>
+            <td data-label="Obras">{{ item.artworks_count ?? 0 }}</td>
+            <td>
+              <span class="ui-cluster" style="--cluster-gap: var(--space-1)">
+                <button uiButton="secondary" type="button" class="adm-icon-btn" [disabled]="first"
+                        (click)="move(i, -1)" [attr.aria-label]="'Subir ' + item.name">↑</button>
+                <button uiButton="secondary" type="button" class="adm-icon-btn" [disabled]="last"
+                        (click)="move(i, 1)" [attr.aria-label]="'Descer ' + item.name">↓</button>
+              </span>
+            </td>
+            <td>
+              <span class="ui-cluster" style="--cluster-gap: var(--space-4); justify-content: flex-end">
+                <button uiButton="link" type="button" (click)="startEdit(item)">Editar</button>
+                <button uiButton="link" type="button" (click)="toDelete.set(item)">Excluir</button>
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>
+
+<ui-confirm-dialog
+  [open]="toDelete() !== null"
+  [title]="'Excluir “' + (toDelete()?.name ?? '') + '”?'"
+  message="Esta ação não pode ser desfeita. Só é possível excluir quando nenhuma obra usa este item."
+  confirmLabel="Excluir"
+  [busy]="deleting()"
+  (confirmed)="confirmDelete()"
+  (closed)="toDelete.set(null)" />

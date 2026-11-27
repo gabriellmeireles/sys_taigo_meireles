@@ -28,6 +28,11 @@ export class ToastService {
   dismiss(id: number): void {
     this.items.update((list) => list.filter((t) => t.id !== id));
   }
+
+  /** Remove todos os avisos (ex.: erros antigos ao tentar salvar de novo). */
+  clear(): void {
+    this.items.set([]);
+  }
 }
 
 /**

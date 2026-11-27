@@ -1,0 +1,105 @@
+<div class="adm-page-head">
+  <div class="ui-stack" style="--stack-gap: var(--space-2)">
+    <span class="ui-eyebrow">Conteúdo</span>
+    <h1>Obras @if (result()) { <span class="ui-muted" style="font-size: var(--fs-h4)">({{ result()!.meta.total }})</span> }</h1>
+  </div>
+  <a routerLink="/obras/nova" uiButton="primary">+ Nova obra</a>
+</div>
+
+<form class="adm-filters" [formGroup]="filters" (submit)="$event.preventDefault()" role="search">
+  <ui-form-field label="Buscar por título">
+    <input uiInput type="search" formControlName="q" placeholder="Ex.: Tigre" />
+  </ui-form-field>
+  <ui-form-field label="Status">
+    <select uiInput formControlName="status">
+      <option value="">Todos</option>
+      @for (s of statuses; track s) {
+        <option [value]="s">{{ statusLabels[s] }}</option>
+      }
+    </select>
+  </ui-form-field>
+  <ui-form-field label="Série">
+    <select uiInput formControlName="series_id">
+      <option value="">Todas</option>
+      @for (s of series(); track s.id) {
+        <option [value]="s.id">{{ s.name }}</option>
+      }
+    </select>
+  </ui-form-field>
+</form>
+
+<section [attr.aria-busy]="loading()" aria-live="polite">
+  @if (error()) {
+    <ui-state kind="error" [title]="error()!">
+      <button uiButton="secondary" type="button" (click)="reload()">Tentar novamente</button>
+    </ui-state>
+  } @else if (loading() && !result()) {
+    <div class="adm-panel"><ui-skeleton shape="text" [lines]="8" /></div>
+  } @else if (result()!.data.length === 0) {
+    @if (hasFilters()) {
+      <ui-state title="Nenhuma obra encontrada com esses filtros.">
+        <button uiButton="secondary" type="button" (click)="clearFilters()">Limpar filtros</button>
+      </ui-state>
+    } @else {
+      <ui-state title="Nenhuma obra cadastrada ainda.">
+        <a routerLink="/obras/nova" uiButton="primary">Cadastrar a primeira obra</a>
+      </ui-state>
+    }
+  } @else {
+    <table class="adm-table" [style.opacity]="loading() ? 0.6 : 1">
+      <caption class="ui-visually-hidden">Obras cadastradas</caption>
+      <thead>
+        <tr>
+          <th scope="col"><span class="ui-visually-hidden">Imagem</span></th>
+          <th scope="col">Título</th>
+          <th scope="col">Ano</th>
+          <th scope="col">Série</th>
+          <th scope="col">Status</th>
+          <th scope="col">Preço</th>
+          <th scope="col">Traduções</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of result()!.data; track item.id) {
+          <tr>
+            <td class="adm-table__thumb">
+              @if (item.thumbnail_url) {
+                <img class="adm-thumb" [src]="item.thumbnail_url" alt="" loading="lazy"
+                     [style.background-color]="item.thumbnail_color" />
+              } @else {
+                <span class="adm-thumb"></span>
+              }
+            </td>
+            <td><a [routerLink]="['/obras', item.id]">{{ item.title }}</a></td>
+            <td data-label="Ano">{{ item.year }}</td>
+            <td data-label="Série">{{ item.series ?? '—' }}</td>
+            <td>
+              <label class="ui-visually-hidden" [attr.for]="'status-' + item.id">Status de {{ item.title }}</label>
+              <select class="ui-input adm-status-select" [id]="'status-' + item.id" [value]="item.status"
+                      (change)="changeStatus(item, $any($event.target).value)">
+                @for (s of statuses; track s) {
+                  <option [value]="s" [selected]="s === item.status">{{ statusLabels[s] }}</option>
+                }
+              </select>
+            </td>
+            <td data-label="Preço" class="ui-muted">{{ price(item) }}</td>
+            <td>
+              <span class="ui-cluster" style="--cluster-gap: var(--space-2)">
+                <ui-translation-badge [state]="item.translation_states.en" prefix="EN " />
+                <ui-translation-badge [state]="item.translation_states.es" prefix="ES " />
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (result()!.meta.last_page > 1) {
+      <nav class="adm-pagination" aria-label="Paginação">
+        <button uiButton="secondary" type="button" [disabled]="page() <= 1" (click)="goTo(page() - 1)">← Anterior</button>
+        <span>Página {{ result()!.meta.current_page }} de {{ result()!.meta.last_page }}</span>
+        <button uiButton="secondary" type="button" [disabled]="page() >= result()!.meta.last_page" (click)="goTo(page() + 1)">Próxima →</button>
+      </nav>
+    }
+  }
+</section>

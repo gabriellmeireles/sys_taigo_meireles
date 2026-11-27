@@ -1,0 +1,49 @@
+<a class="ui-skip-link" href="#conteudo">Ir para o conteúdo</a>
+
+<div class="adm-shell" [class.adm-shell--menu-open]="menuOpen()">
+  <aside class="adm-sidebar ui-on-dark" id="menu-painel">
+    <a class="adm-sidebar__brand" routerLink="/obras">
+      <ui-logo variant="horizontal" label="Taigo Meireles — painel" />
+    </a>
+
+    <nav aria-label="Menu do painel">
+      @for (group of groups; track $index) {
+        @if (group.title) {
+          <p class="adm-sidebar__group">{{ group.title }}</p>
+        }
+        <ul>
+          @for (item of group.items; track item.label) {
+            <li>
+              @if (item.link) {
+                <a [routerLink]="item.link" routerLinkActive="is-active" ariaCurrentWhenActive="page">{{ item.label }}</a>
+              } @else {
+                <span class="adm-sidebar__soon" aria-disabled="true">
+                  {{ item.label }} <span class="adm-sidebar__tag">em breve</span>
+                </span>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </nav>
+  </aside>
+
+  <button type="button" class="adm-backdrop" aria-hidden="true" tabindex="-1" (click)="menuOpen.set(false)"></button>
+
+  <div class="adm-main">
+    <header class="adm-topbar">
+      <button type="button" class="adm-topbar__menu" aria-controls="menu-painel"
+              [attr.aria-expanded]="menuOpen()" (click)="menuOpen.set(!menuOpen())">
+        {{ menuOpen() ? 'Fechar' : 'Menu' }}
+      </button>
+      <span class="adm-topbar__spacer"></span>
+      <a class="adm-topbar__link" [href]="siteUrl" target="_blank" rel="noopener">Ver o site ↗</a>
+      <span class="adm-topbar__user" title="{{ session.admin()?.email }}">{{ session.admin()?.name }}</span>
+      <button type="button" class="adm-topbar__link" (click)="logout()">Sair</button>
+    </header>
+
+    <main id="conteudo" class="adm-content" tabindex="-1">
+      <router-outlet />
+    </main>
+  </div>
+</div>

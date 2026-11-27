@@ -1,0 +1,221 @@
+<div class="adm-page-head">
+  <div class="ui-stack" style="--stack-gap: var(--space-2)">
+    <a routerLink="/obras" class="ui-body-sm">← Obras</a>
+    <h1>{{ artworkId() ? (sourceTranslation().title || 'Editar obra') : 'Nova obra' }}</h1>
+  </div>
+</div>
+
+@if (loadError()) {
+  <ui-state kind="error" [title]="loadError()!">
+    <a routerLink="/obras" uiButton="secondary">Voltar às obras</a>
+  </ui-state>
+} @else if (loading()) {
+  <div class="adm-panel"><ui-skeleton shape="text" [lines]="10" /></div>
+} @else {
+  <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+
+    <!-- Idioma de edição -->
+    <div class="adm-locale-tabs" role="group" aria-label="Idioma de edição dos textos">
+      @for (l of locales; track l) {
+        <button type="button" [attr.aria-pressed]="locale() === l" (click)="locale.set(l)">
+          {{ localeLabels[l] }}{{ l === 'pt-BR' ? ' (origem)' : '' }}
+          @if (l !== 'pt-BR' && translationStates()) {
+            <ui-translation-badge [state]="translationStates()![l]" />
+          }
+        </button>
+      }
+    </div>
+
+    <!-- 1. Dados -->
+    <section class="adm-panel" aria-labelledby="sec-dados">
+      <h2 id="sec-dados">Dados</h2>
+      <div class="adm-fields" [formGroup]="tGroup()">
+        <ng-container>
+          <ui-form-field class="adm-span-2" [label]="'Título' + (locale() === 'pt-BR' ? '' : ' (' + localeLabels[locale()] + ')')"
+                         [required]="locale() === 'pt-BR'" [error]="err('translations.' + locale() + '.title')"
+                         [hint]="locale() !== 'pt-BR' && sourceTranslation().title ? 'Original: ' + sourceTranslation().title : null">
+            <input uiInput type="text" formControlName="title" maxlength="200" />
+          </ui-form-field>
+        </ng-container>
+      </div>
+
+      <div class="adm-fields adm-fields--3" style="margin-top: var(--space-5)">
+        <ui-form-field label="Ano" [required]="true" [error]="err('year')">
+          <input uiInput type="number" formControlName="year" min="1900" max="2100" inputmode="numeric" />
+        </ui-form-field>
+        <ui-form-field label="Altura (cm)" [error]="err('height_cm')">
+          <input uiInput type="number" formControlName="height_cm" min="0" step="0.1" inputmode="decimal" />
+        </ui-form-field>
+        <ui-form-field label="Largura (cm)" [error]="err('width_cm')">
+          <input uiInput type="number" formControlName="width_cm" min="0" step="0.1" inputmode="decimal" />
+        </ui-form-field>
+        <ui-form-field label="Profundidade (cm)" hint="Opcional." [error]="err('depth_cm')">
+          <input uiInput type="number" formControlName="depth_cm" min="0" step="0.1" inputmode="decimal" />
+        </ui-form-field>
+        <ui-form-field label="Série" [required]="true" [error]="err('series_id')">
+          <select uiInput formControlName="series_id">
+            <option [ngValue]="null">Escolha…</option>
+            @for (s of series(); track s.id) { <option [ngValue]="s.id">{{ s.name }}</option> }
+          </select>
+        </ui-form-field>
+        <ui-form-field label="Técnica" [required]="true" [error]="err('technique_id')">
+          <select uiInput formControlName="technique_id">
+            <option [ngValue]="null">Escolha…</option>
+            @for (t of techniques(); track t.id) { <option [ngValue]="t.id">{{ t.name }}</option> }
+          </select>
+        </ui-form-field>
+        <ui-form-field label="Categoria" [required]="true" [error]="err('category_id')">
+          <select uiInput formControlName="category_id">
+            <option [ngValue]="null">Escolha…</option>
+            @for (c of categories(); track c.id) { <option [ngValue]="c.id">{{ c.name }}</option> }
+          </select>
+        </ui-form-field>
+      </div>
+
+      <div class="adm-fields" [formGroup]="tGroup()" style="margin-top: var(--space-5)">
+        <ng-container>
+          <ui-form-field class="adm-span-2" [label]="'Descrição' + (locale() === 'pt-BR' ? '' : ' (' + localeLabels[locale()] + ')')"
+                         hint="Texto sobre a obra. Separe parágrafos com uma linha em branco."
+                         [error]="err('translations.' + locale() + '.description')">
+            <textarea uiInput formControlName="description" rows="6" maxlength="20000"></textarea>
+          </ui-form-field>
+          @if (locale() !== 'pt-BR' && sourceTranslation().description) {
+            <p class="adm-source-text adm-span-2">Original: {{ sourceTranslation().description }}</p>
+          }
+          <ui-form-field class="adm-span-2" label="Observação sobre as dimensões" hint="Opcional. Ex.: díptico, 2 × 60 × 80 cm."
+                         [error]="err('translations.' + locale() + '.dimensions_note')">
+            <input uiInput type="text" formControlName="dimensions_note" maxlength="200" />
+          </ui-form-field>
+        </ng-container>
+      </div>
+    </section>
+
+    <!-- 2. Imagens -->
+    <section class="adm-panel" aria-labelledby="sec-imagens">
+      <h2 id="sec-imagens">Imagens</h2>
+      <label class="adm-dropzone" [class.is-dragging]="dragging()"
+             (dragover)="$event.preventDefault(); dragging.set(true)" (dragleave)="dragging.set(false)" (drop)="onDrop($event)">
+        <input type="file" multiple [accept]="accept" class="ui-visually-hidden" (change)="onFiles($any($event.target).files); $any($event.target).value = ''" />
+        <span>Arraste imagens aqui ou <span class="ui-btn ui-btn--link">selecione os arquivos</span></span>
+        <span class="ui-caption">JPG, PNG, TIFF ou WebP, até {{ maxMb }} MB cada. A primeira vira a principal.</span>
+      </label>
+      @if (err('images')) {
+        <p class="ui-field__error" style="margin-top: var(--space-3)">{{ err('images') }}</p>
+      }
+      @for (p of uploadProblems(); track p) {
+        <p class="ui-field__error" style="margin-top: var(--space-2)">{{ p }}</p>
+      }
+
+      @if (images.items().length) {
+        <ol class="adm-images">
+          @for (img of images.items(); track img.key; let i = $index, first = $first, last = $last) {
+            <li class="adm-image" [class.is-primary]="img.isPrimary">
+              <div class="adm-image__preview" [style.background-color]="img.media?.dominant_color">
+                @if (img.media?.preview_url) {
+                  <img [src]="img.media!.preview_url" [alt]="'Imagem ' + (i + 1) + ' da obra'" />
+                }
+              </div>
+              <div class="adm-image__info">
+                <span class="ui-body-sm">{{ img.fileName }}</span>
+                @switch (img.state) {
+                  @case ('uploading') { <ui-progress [value]="img.progress" [label]="'Enviando ' + img.fileName" /><span class="ui-caption">Enviando… {{ img.progress }}%</span> }
+                  @case ('processing') { <ui-progress [label]="'Gerando versões de ' + img.fileName" /><span class="ui-caption">Gerando versão otimizada…</span> }
+                  @case ('failed') { <span class="ui-field__error">{{ img.error }}</span> }
+                  @case ('ready') {
+                    <span class="ui-caption">{{ img.media?.width }} × {{ img.media?.height }} px
+                      @if (img.isPrimary) { · <strong class="adm-primary-tag">★ Principal</strong> }</span>
+                  }
+                }
+              </div>
+              <div class="adm-image__actions">
+                @if (!img.isPrimary && img.state !== 'failed') {
+                  <button uiButton="link" type="button" (click)="images.setPrimary(img.key)">Tornar principal</button>
+                }
+                <button uiButton="secondary" type="button" class="adm-icon-btn" [disabled]="first" (click)="images.move(i, -1)" [attr.aria-label]="'Mover imagem ' + (i + 1) + ' para cima'">↑</button>
+                <button uiButton="secondary" type="button" class="adm-icon-btn" [disabled]="last" (click)="images.move(i, 1)" [attr.aria-label]="'Mover imagem ' + (i + 1) + ' para baixo'">↓</button>
+                @if (img.media && img.state === 'ready') {
+                  <a uiButton="link" [href]="img.media.original_url" target="_blank" rel="noopener">Original</a>
+                }
+                <button uiButton="link" type="button" (click)="images.remove(img.key)">Remover</button>
+              </div>
+            </li>
+          }
+        </ol>
+      }
+    </section>
+
+    <!-- 3. Vídeo -->
+    <section class="adm-panel" aria-labelledby="sec-video">
+      <h2 id="sec-video">Vídeo</h2>
+      <ui-form-field label="Link do YouTube" hint="Opcional. Ex.: https://youtu.be/…" [error]="err('video_url')">
+        <input uiInput type="url" formControlName="video_url" maxlength="500" />
+      </ui-form-field>
+    </section>
+
+    <!-- 4. Status e preço -->
+    <section class="adm-panel" aria-labelledby="sec-preco">
+      <h2 id="sec-preco">Status e preço</h2>
+      <fieldset class="adm-fieldset">
+        <legend class="ui-field__label">Status <span aria-hidden="true">*</span></legend>
+        <div class="ui-cluster" style="--cluster-gap: var(--space-5)">
+          @for (s of statuses; track s) {
+            <label class="ui-check"><input type="radio" formControlName="status" [value]="s" /> {{ statusLabels[s] }}</label>
+          }
+        </div>
+      </fieldset>
+      <div class="adm-fields" style="margin-top: var(--space-5)">
+        <ui-form-field label="Preço em reais (R$)" [required]="showPrice()" [error]="err('price_brl')">
+          <input uiInput type="number" formControlName="price_brl" min="0" step="1" inputmode="decimal" />
+        </ui-form-field>
+        <ui-form-field label="Preço em dólares (US$)" [required]="showPrice()" [error]="err('price_usd')">
+          <input uiInput type="number" formControlName="price_usd" min="0" step="1" inputmode="decimal" />
+        </ui-form-field>
+      </div>
+      <label class="ui-check" style="margin-top: var(--space-4)">
+        <input class="ui-switch" type="checkbox" formControlName="show_price" /> Exibir preço no site
+      </label>
+      @if (priceWarning()) {
+        <p class="adm-notice" style="margin-top: var(--space-3)">{{ priceWarning() }}</p>
+      }
+    </section>
+
+    <!-- 5. SEO -->
+    <section class="adm-panel" aria-labelledby="sec-seo">
+      <h2 id="sec-seo">SEO e compartilhamento ({{ localeLabels[locale()] }})</h2>
+      <div class="adm-fields" [formGroup]="tGroup()">
+        <ui-form-field class="adm-span-2" label="Endereço (slug)" hint="Opcional. Gerado do título quando vazio."
+                       [error]="err('translations.' + locale() + '.slug')">
+          <input uiInput type="text" formControlName="slug" maxlength="220" />
+        </ui-form-field>
+        <ui-form-field label="Título para buscadores" [hint]="(currentTranslation().seo_title?.length ?? 0) + '/70 · vazio usa o título da obra'"
+                       [error]="err('translations.' + locale() + '.seo_title')">
+          <input uiInput type="text" formControlName="seo_title" maxlength="70" />
+        </ui-form-field>
+        <ui-form-field label="Descrição para buscadores" [hint]="(currentTranslation().seo_description?.length ?? 0) + '/170'"
+                       [error]="err('translations.' + locale() + '.seo_description')">
+          <textarea uiInput formControlName="seo_description" rows="3" maxlength="170"></textarea>
+        </ui-form-field>
+      </div>
+      <div class="adm-seo-preview" aria-label="Prévia do resultado de busca">
+        <span class="ui-caption">{{ siteUrl }}{{ slugPreview() }}</span>
+        <span class="adm-seo-preview__title">{{ currentTranslation().seo_title || currentTranslation().title || 'Título da obra' }} — Taigo Meireles</span>
+        <span class="ui-body-sm ui-muted">{{ currentTranslation().seo_description || 'Descrição que aparece no Google e nas prévias de link.' }}</span>
+      </div>
+    </section>
+
+    <div class="adm-actions">
+      @if (hasUnsavedChanges()) {
+        <span class="adm-actions__note">Alterações não salvas</span>
+      }
+      @if (artworkId()) {
+        <button uiButton="link" type="button" (click)="confirmDelete.set(true)">Excluir obra</button>
+      }
+      <a routerLink="/obras" uiButton="secondary">Cancelar</a>
+      <button uiButton="primary" type="submit" [loading]="saving()">{{ saving() ? 'Salvando…' : 'Salvar e publicar' }}</button>
+    </div>
+  </form>
+
+  <ui-confirm-dialog [open]="confirmDelete()" [title]="'Excluir “' + (sourceTranslation().title || 'obra') + '”?'"
+    message="A obra sai do site imediatamente. As imagens continuam na biblioteca de mídia. Esta ação não pode ser desfeita."
+    confirmLabel="Excluir" [busy]="deleting()" (confirmed)="remove()" (closed)="confirmDelete.set(false)" />
+}

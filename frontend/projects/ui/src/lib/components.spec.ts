@@ -143,6 +143,9 @@ describe('ToastService', () => {
     service.dismiss(id);
     await fixture.whenStable();
     expect(service.toasts()).toHaveLength(1);
+
+    service.clear();
+    expect(service.toasts()).toHaveLength(0);
   });
 
   it('some sozinho depois do tempo definido', () => {
