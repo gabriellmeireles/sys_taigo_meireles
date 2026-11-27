@@ -1,6 +1,11 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\ArtworkController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\MediaController;
+use App\Http\Controllers\Admin\SeriesController;
+use App\Http\Controllers\Admin\TechniqueController;
 use App\Http\Controllers\Admin\Auth\PasswordController;
 use App\Http\Controllers\Admin\Auth\SessionController;
 use Illuminate\Support\Facades\Route;
@@ -35,5 +40,22 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['auth:sanctum', 'admin.active'])->group(function () {
         Route::apiResource('admins', AdminController::class)->except('show');
         Route::post('admins/{admin}/resend-invite', [AdminController::class, 'resendInvite']);
+
+        // Catálogo
+        foreach (['categories' => CategoryController::class, 'techniques' => TechniqueController::class, 'series' => SeriesController::class] as $uri => $controller) {
+            Route::put("{$uri}/order", [$controller, 'reorder']);
+            Route::get($uri, [$controller, 'index']);
+            Route::post($uri, [$controller, 'store']);
+            Route::put("{$uri}/{id}", [$controller, 'update'])->whereNumber('id');
+            Route::delete("{$uri}/{id}", [$controller, 'destroy'])->whereNumber('id');
+        }
+
+        Route::apiResource('artworks', ArtworkController::class);
+        Route::patch('artworks/{artwork}/status', [ArtworkController::class, 'updateStatus']);
+
+        // Mídia (imagens)
+        Route::post('media', [MediaController::class, 'store']);
+        Route::get('media/{media}', [MediaController::class, 'show']);
+        Route::get('media/{media}/original', [MediaController::class, 'original']);
     });
 });

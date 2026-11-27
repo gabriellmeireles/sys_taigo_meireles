@@ -14,3 +14,6 @@ Thumbs.db
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# Imagens reais de obras para testes locais (direitos do artista: fora do Git)
+dev-data/

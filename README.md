@@ -69,6 +69,22 @@ Sessão com cookie (Laravel Sanctum, modo SPA). O painel chama `GET /sanctum/csr
 | `PATCH admins/{id}` · `DELETE admins/{id}` | Renomear, ativar/desativar · excluir (não vale para a própria conta) |
 | `POST admins/{id}/resend-invite` | Reenviar convite |
 
+## API do painel — catálogo (etapa 3a)
+
+| Método e rota (`/api/v1/admin/...`) | Função |
+|---|---|
+| `GET` · `POST` · `PUT {id}` · `DELETE {id}` `categories`, `techniques`, `series` | Nome por idioma (PT obrigatório), slug automático; exclusão bloqueada se houver obras |
+| `PUT categories/order` (idem techniques, series) | Nova ordem: `{ "ids": [3, 1, 2] }` |
+| `GET artworks` | Lista com busca (`q`), filtros (`status`, `series_id`, `category_id`, `technique_id`, `year`) e miniatura |
+| `GET` · `POST` · `PUT {id}` · `DELETE {id}` `artworks` | Obra completa: dados, traduções, vídeo do YouTube e imagens (ordem + uma principal) |
+| `PATCH artworks/{id}/status` | Troca rápida de status |
+| `POST media` | Upload de imagem (JPG, PNG, TIFF, WebP até 30 MB); gera versões na fila |
+| `GET media/{id}` · `GET media/{id}/original` | Situação do processamento · baixar o original |
+
+**Imagens**: o original fica privado em `storage/app/private/media/originals`; as versões (480, 960, 1600 e 2400 px em WebP e JPEG, nunca maiores que o original, e 1200×630 para compartilhamento) ficam em `storage/app/public/media` e são servidas em `/storage/...`. Processadas com Imagick: orientação aplicada, EXIF/GPS removidos, perfil de cor mantido, sem marca d'água.
+
+**Obras de teste**: `bash scripts/import-dev-artworks.sh` importa `dev-data/series/<série>/<TÍTULO> - <altura>x<largura>cm - <ano>.jpg` (pasta fora do Git) com status e preços fictícios. `bash scripts/check-media.sh` resume as imagens processadas.
+
 Limites do PHP no ambiente: upload 30 MB, memória 1024 MB, 60 s (`docker/php/php.ini`).
 
 ## Especificação (na ordem pedida)
