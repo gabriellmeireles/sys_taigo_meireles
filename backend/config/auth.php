@@ -17,7 +17,7 @@ return [
 
     'defaults' => [
         'guard' => env('AUTH_GUARD', 'web'),
-        'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
+        'passwords' => env('AUTH_PASSWORD_BROKER', 'admins'),
     ],
 
     /*
@@ -40,7 +40,7 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'admins',
         ],
     ],
 
@@ -62,7 +62,7 @@ return [
     */
 
     'providers' => [
-        'users' => [
+        'admins' => [
             'driver' => 'eloquent',
             // Painel: somente administradores (tabela admins). Ver docs/05-arquitetura.md §6.6.
             'model' => env('AUTH_MODEL', Admin::class),
@@ -94,10 +94,19 @@ return [
     */
 
     'passwords' => [
-        'users' => [
-            'provider' => 'users',
-            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+        // "Esqueci minha senha": link válido por 60 minutos.
+        'admins' => [
+            'provider' => 'admins',
+            'table' => 'password_reset_tokens',
             'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        // Convite de novo administrador: link para definir a senha, válido por 72 horas.
+        'invites' => [
+            'provider' => 'admins',
+            'table' => 'admin_invite_tokens',
+            'expire' => 72 * 60,
             'throttle' => 60,
         ],
     ],

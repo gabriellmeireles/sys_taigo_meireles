@@ -247,11 +247,11 @@ Prefixo versionado `/api/v1`. Público em `/public`, administrativo em `/admin`.
 | Integrações | `GET /admin/integrations` (status) · `POST /admin/integrations/{key}/test` · `POST /admin/integrations/instagram/sync` |
 
 ## 6.6 Autenticação e autorização administrativas
-- **Mecanismo (Sugestão):** autenticação de SPA por **sessão com cookie** `HttpOnly`, `Secure`, `SameSite=Lax` e proteção CSRF, com painel e API sob o mesmo domínio raiz (ex.: `admin.` e `api.`). O ecossistema Laravel oferece pacote oficial para isso (Sanctum, modo SPA) — sugestão, não decisão. Alternativa: token Bearer de curta duração (exige guardar token no navegador; menos recomendado).
+- **Mecanismo (decidido e implementado na etapa 1):** **Laravel Sanctum em modo SPA** — sessão com cookie `HttpOnly`, `SameSite=Lax` e proteção CSRF (`GET /sanctum/csrf-cookie` antes do login), com painel e API sob o mesmo domínio raiz (ex.: `admin.` e `api.`). Sem starter kit e sem Fortify: rotas próprias em `/api/v1/admin/auth/*` sobre `Auth`, `Hash`, `RateLimiter` e o **Password Broker** do Laravel. CORS restrito às origens do site e do painel (`CORS_ALLOWED_ORIGINS`), com credenciais.
 - **Senhas:** hash com algoritmo forte padrão do framework (bcrypt ou Argon2id); mínimo 12 caracteres; verificação contra senhas comuns (sugestão).
 - **Login:** limite de tentativas por e-mail+IP (ex.: 5/min) e bloqueio progressivo; mensagens genéricas; regenerar sessão após login; expiração após 1 h de inatividade (P-32, decidido).
-- **Recuperação de senha:** token aleatório, armazenado **com hash**, uso único, validade de 60 min; resposta idêntica exista ou não o e-mail; ao redefinir, invalida outras sessões; e-mail com link para `admin.<dominio>/redefinir-senha?token=…&email=…`.
-- **Convite de administrador:** criar administrador envia link de "definir senha" (mesmo mecanismo do reset, validade maior, ex.: 72 h).
+- **Recuperação de senha:** Password Broker `admins` (tabela `password_reset_tokens`): token aleatório, armazenado **com hash**, uso único, validade de 60 min; resposta idêntica exista ou não o e-mail; ao redefinir, encerra todas as sessões; e-mail com link para `admin.<dominio>/redefinir-senha?token=…&email=…`.
+- **Convite de administrador:** Password Broker `invites` (tabela `admin_invite_tokens`, validade de 72 h): criar administrador envia link para `admin.<dominio>/definir-senha?token=…&email=…`. Um token de um broker não vale no outro.
 - **Autorização:** papel único "administrador" — todo usuário autenticado e **ativo** acessa todas as rotas `/admin`. Regras de negócio: não excluir/desativar a si mesmo; manter ao menos 1 administrador ativo. Middleware verifica `is_active` a cada requisição.
 - **Fora do escopo:** 2FA, auditoria, papéis distintos.
 

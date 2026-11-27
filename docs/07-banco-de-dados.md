@@ -147,7 +147,7 @@ erDiagram
 |---|---|---|
 | Idiomas | `locales` | Os 3 idiomas, prefixo de URL, moeda (BRL/USD), idioma de origem e de fallback |
 | Acesso | `admins` | Administradores (mesmas permissões), ativo/inativo |
-| | `admin_password_tokens` | Tokens de reset e convite, com hash, validade e uso único |
+| | `password_reset_tokens`, `admin_invite_tokens` | Tokens de "esqueci a senha" (60 min) e de convite (72 h), no formato do Password Broker do Laravel: e-mail, token com hash, data. Substituíram `admin_password_tokens` do DDL original (migração `2026_11_26_000200`) |
 | Mídia | `media_files` | **Arquivo original** (imagem ou PDF): caminho, nome, MIME, tamanho, dimensões, perfil de cor, checksum, status de processamento |
 | | `media_variants` | **Versões otimizadas** derivadas do original (tamanho × formato) |
 | | `media_file_translations` | Texto alternativo e legenda por idioma |

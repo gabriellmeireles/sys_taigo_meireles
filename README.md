@@ -42,7 +42,28 @@ docker compose logs -f worker                            # fila e agendador
 bash scripts/migrate-fresh.sh                            # recria o banco local do zero (apaga os dados)
 bash scripts/smoke-db.sh                                 # testa as regras do banco e o rollback
 bash scripts/smoke-up.sh                                 # sobe tudo e confere se cada serviço responde
+bash scripts/test.sh                                     # testes automatizados do backend (banco taigo_test)
+bash scripts/smoke-auth.sh                               # login do painel ponta a ponta (CSRF, sessão, CORS, e-mail)
 ```
+
+Na primeira vez com um volume do MySQL que já existia, crie o banco de testes: `bash scripts/create-test-db.sh`.
+
+## API do painel — autenticação (etapa 1)
+
+Sessão com cookie (Laravel Sanctum, modo SPA). O painel chama `GET /sanctum/csrf-cookie` e depois envia o cabeçalho `X-XSRF-TOKEN` com o valor do cookie `XSRF-TOKEN`.
+
+| Método e rota (`/api/v1/admin/...`) | Função |
+|---|---|
+| `POST auth/login` | Entrar (e-mail e senha; 5 tentativas por minuto por e-mail+IP) |
+| `POST auth/logout` | Sair |
+| `GET auth/me` · `PATCH auth/me` | Ver ou alterar nome e e-mail da própria conta |
+| `PUT auth/password` | Trocar a própria senha (exige a atual; encerra as outras sessões) |
+| `POST auth/forgot-password` | Enviar link de redefinição (60 min); resposta igual exista ou não o e-mail |
+| `POST auth/reset-password` | Redefinir a senha com o link |
+| `POST auth/accept-invite` | Definir a senha a partir do convite (72 h) |
+| `GET admins` · `POST admins` | Listar · convidar administrador |
+| `PATCH admins/{id}` · `DELETE admins/{id}` | Renomear, ativar/desativar · excluir (não vale para a própria conta) |
+| `POST admins/{id}/resend-invite` | Reenviar convite |
 
 Limites do PHP no ambiente: upload 30 MB, memória 1024 MB, 60 s (`docker/php/php.ini`).
 
