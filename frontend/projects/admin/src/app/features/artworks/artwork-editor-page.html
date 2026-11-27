@@ -26,6 +26,27 @@
       }
     </div>
 
+    @if (locale() !== 'pt-BR') {
+      <div class="adm-notice adm-translation-note" [class.adm-notice--error]="localeState() === 'outdated'" role="status">
+        <span>
+          @switch (localeState()) {
+            @case ('auto') { Tradução automática. Revise os textos e salve para marcá-la como revisada. }
+            @case ('outdated') { O português mudou depois desta revisão. Atualize os textos ou retraduza. }
+            @case ('missing') {
+              @if (artworkId()) { Ainda sem tradução: o site mostra o português. }
+              @else { A tradução automática é gerada ao salvar a obra. }
+            }
+            @default { Tradução revisada. }
+          }
+        </span>
+        @if (artworkId()) {
+          <button uiButton="secondary" type="button" [loading]="translating()" (click)="regenerate()">
+            {{ translating() ? 'Traduzindo…' : (localeState() === 'missing' ? 'Gerar tradução automática' : 'Retraduzir automaticamente') }}
+          </button>
+        }
+      </div>
+    }
+
     <!-- 1. Dados -->
     <section class="adm-panel" aria-labelledby="sec-dados">
       <h2 id="sec-dados">Dados</h2>
@@ -171,8 +192,11 @@
           <input uiInput type="number" formControlName="price_usd" min="0" step="1" inputmode="decimal" />
         </ui-form-field>
       </div>
-      <label class="ui-check" style="margin-top: var(--space-4)">
-        <input class="ui-switch" type="checkbox" formControlName="show_price" /> Exibir preço no site
+      <label class="ui-toggle" style="margin-top: var(--space-4)">
+        <input type="checkbox" role="switch" formControlName="show_price" />
+        <span class="ui-toggle__track" aria-hidden="true"></span>
+        <span class="ui-toggle__label">Exibir preço no site</span>
+        <span class="ui-toggle__state" data-on="Ligado" data-off="Desligado" aria-hidden="true"></span>
       </label>
       @if (priceWarning()) {
         <p class="adm-notice" style="margin-top: var(--space-3)">{{ priceWarning() }}</p>

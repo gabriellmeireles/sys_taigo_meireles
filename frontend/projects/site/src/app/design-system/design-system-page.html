@@ -103,7 +103,12 @@
         <label class="ui-check"><input type="checkbox" checked /> Disponível</label>
         <label class="ui-check"><input type="radio" name="status" checked /> Reservada</label>
         <label class="ui-check"><input type="radio" name="status" /> Vendida</label>
-        <label class="ui-check"><input class="ui-switch" type="checkbox" checked /> Exibir preço</label>
+        <label class="ui-toggle">
+          <input type="checkbox" role="switch" checked />
+          <span class="ui-toggle__track" aria-hidden="true"></span>
+          <span class="ui-toggle__label">Exibir preço</span>
+          <span class="ui-toggle__state" data-on="Ligado" data-off="Desligado" aria-hidden="true"></span>
+        </label>
       </div>
     </form>
   </section>

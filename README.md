@@ -85,6 +85,15 @@ Sessão com cookie (Laravel Sanctum, modo SPA). O painel chama `GET /sanctum/csr
 
 **Obras de teste**: `bash scripts/import-dev-artworks.sh` importa `dev-data/series/<série>/<TÍTULO> - <altura>x<largura>cm - <ano>.jpg` (pasta fora do Git) com status e preços fictícios. `bash scripts/check-media.sh` resume as imagens processadas.
 
+## Traduções (etapa 4)
+
+- Ao salvar em português, a fila traduz EN e ES pelo LibreTranslate (`TRANSLATION_PROVIDER=libretranslate`; `none` desliga). O fornecedor fica atrás da interface `App\Domain\Localization\Translator` — para trocar, crie outra implementação e registre em `AppServiceProvider`.
+- Estados: **automática** (pode ser refeita a cada mudança do português), **revisada** (editada por alguém; nunca é sobrescrita sozinha), **desatualizada** (revisada, mas o português mudou depois), **ausente** (o site mostra o português).
+- Nomes de séries, técnicas e categorias são traduzidos à mão (sem glossário no LibreTranslate).
+- Painel: `/traducoes` (progresso por idioma, filtros, gerar/retraduzir) e avisos por idioma no editor de obra (`/obras/:id?idioma=en`).
+- API: `GET admin/translations?locale=en&state=&type=&q=`, `GET admin/translations/progress`, `POST admin/translations/{type}/{id}/{locale}/auto`.
+- `php artisan translations:sync --type=artwork` agenda o que falta (ex.: após importar conteúdo). `bash scripts/translate-dev.sh` faz isso no ambiente local e mostra o resultado.
+
 ## Painel (etapa 3b)
 
 http://localhost:4201 — entre com o administrador de teste (`backend/database/seeders/DevAdminSeeder.php`).

@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\SeriesController;
 use App\Http\Controllers\Admin\TechniqueController;
+use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\Auth\PasswordController;
 use App\Http\Controllers\Admin\Auth\SessionController;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +53,12 @@ Route::prefix('admin')->group(function () {
 
         Route::apiResource('artworks', ArtworkController::class);
         Route::patch('artworks/{artwork}/status', [ArtworkController::class, 'updateStatus']);
+
+        // Traduções
+        Route::get('translations', [TranslationController::class, 'index']);
+        Route::get('translations/progress', [TranslationController::class, 'progress']);
+        Route::post('translations/{type}/{id}/{locale}/auto', [TranslationController::class, 'auto'])
+            ->whereNumber('id')->middleware('throttle:30,1');
 
         // Mídia (imagens)
         Route::post('media', [MediaController::class, 'store']);

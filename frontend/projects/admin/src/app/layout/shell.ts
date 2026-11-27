@@ -44,7 +44,7 @@ export class Shell {
         { label: 'Mídia' },
       ],
     },
-    { title: 'Idiomas', items: [{ label: 'Traduções' }, { label: 'SEO' }] },
+    { title: 'Idiomas', items: [{ label: 'Traduções', link: '/traducoes' }, { label: 'SEO' }] },
     {
       title: 'Ajustes',
       items: [{ label: 'Contato' }, { label: 'Respostas automáticas' }, { label: 'Site' }, { label: 'Administradores' }],

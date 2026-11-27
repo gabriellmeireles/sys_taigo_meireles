@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Domain\Catalog\Slugger;
+use App\Domain\Localization\TranslationSync;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TaxonomyResource;
 use App\Models\Locale;
@@ -30,7 +31,7 @@ abstract class TaxonomyController extends Controller
 
     abstract protected function foreignKey(): string;
 
-    public function __construct(private Slugger $slugger) {}
+    public function __construct(private Slugger $slugger, private TranslationSync $translations) {}
 
     public function index(): AnonymousResourceCollection
     {
@@ -126,8 +127,18 @@ abstract class TaxonomyController extends Controller
             if ($name === '' || ! in_array($locale, Locale::ALL, true)) {
                 continue;
             }
+            $current = $item->translations()->where('locale_code', $locale)->value('name');
+            if ($current === $name) {
+                continue; // sem mudança: mantém o estado da tradução
+            }
             $slug = $this->slugger->unique($this->translationTable(), $this->foreignKey(), $item->getKey(), $locale, $name, 180);
             $item->saveTranslation($locale, ['name' => $name, 'slug' => $slug], 'manual');
+            if ($locale !== Locale::SOURCE) {
+                $this->translations->markReviewed($item, $locale, request()->user());
+            }
         }
+
+        // Nome em português mudou: traduções revisadas ficam marcadas como desatualizadas
+        $this->translations->sourceSaved($item);
     }
 }

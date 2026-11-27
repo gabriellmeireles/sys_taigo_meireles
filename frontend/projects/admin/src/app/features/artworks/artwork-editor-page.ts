@@ -72,6 +72,8 @@ export class ArtworkEditorPage implements HasUnsavedChanges {
 
   /** Parâmetro da rota: id da obra (ausente em "Nova obra"). */
   readonly id = input<string | undefined>();
+  /** ?idioma=en abre o editor já no idioma (vindo da central de traduções). */
+  readonly idioma = input<string | undefined>();
   protected readonly artworkId = computed(() => (this.id() ? Number(this.id()) : null));
 
   protected readonly locales = LOCALES;
@@ -134,6 +136,11 @@ export class ArtworkEditorPage implements HasUnsavedChanges {
       const id = this.artworkId();
       this.load(id);
     });
+
+    effect(() => {
+      const requested = this.idioma();
+      if (requested && (LOCALES as string[]).includes(requested)) this.locale.set(requested as Locale);
+    });
   }
 
   private translationGroup(): TranslationForm {
@@ -173,7 +180,13 @@ export class ArtworkEditorPage implements HasUnsavedChanges {
           return;
         }
         this.api.artwork(id).subscribe({
-          next: (a) => this.fill(a),
+          next: (a) => {
+            this.fill(a);
+            // Obra recém-criada: as traduções automáticas ainda podem estar na fila
+            if (Object.entries(a.translation_states).some(([l, s]) => l !== 'pt-BR' && s === 'missing')) {
+              this.refreshTranslationsSoon(a.id);
+            }
+          },
           error: (err) => {
             this.loading.set(false);
             this.loadError.set(errorMessage(err, 'Não foi possível carregar a obra.'));
@@ -231,9 +244,12 @@ export class ArtworkEditorPage implements HasUnsavedChanges {
       return;
     }
     const v = this.form.getRawValue();
+    const groups = this.form.controls.translations.controls;
     const translations = Object.fromEntries(
-      // Português sempre vai (mesmo vazio, para a validação apontar o título); os outros só com título
-      LOCALES.filter((l) => l === 'pt-BR' || v.translations[l].title.trim()).map((l) => [l, {
+      // Português sempre vai (mesmo vazio, para a validação apontar o título).
+      // EN/ES só quando a pessoa mexeu: assim uma tradução automática que chegou pela
+      // fila enquanto o editor estava aberto não vira "revisada" por engano.
+      LOCALES.filter((l) => l === 'pt-BR' || (groups[l].dirty && v.translations[l].title.trim())).map((l) => [l, {
         ...v.translations[l],
         slug: v.translations[l].slug.trim() || null,
       }]),
@@ -261,6 +277,7 @@ export class ArtworkEditorPage implements HasUnsavedChanges {
           this.router.navigate(['/obras', artwork.id], { replaceUrl: true });
         } else {
           this.fill(artwork);
+          this.refreshTranslationsSoon(artwork.id);
         }
       },
       error: (err) => {
@@ -278,6 +295,50 @@ export class ArtworkEditorPage implements HasUnsavedChanges {
         setTimeout(() => document.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
       },
     });
+  }
+
+  /** Estado da tradução do idioma em edição. */
+  protected readonly localeState = computed<TranslationState>(() => this.translationStates()?.[this.locale()] ?? 'missing');
+  protected readonly translating = signal(false);
+
+  /** Gera ou refaz a tradução automática do idioma em edição (sobrescreve). */
+  protected regenerate(): void {
+    const id = this.artworkId();
+    if (!id) return;
+    if (this.hasUnsavedChanges()) {
+      this.toasts.show('Salve as alterações antes de gerar a tradução automática.', 'info');
+      return;
+    }
+    this.translating.set(true);
+    this.api.autoTranslate('artwork', id, this.locale()).subscribe({
+      next: () => {
+        this.api.artwork(id).subscribe((a) => {
+          this.translating.set(false);
+          this.fill(a);
+          this.toasts.show(`Tradução automática em ${LOCALE_LABELS[this.locale()]} gerada. Revise e salve para marcá-la como revisada.`);
+        });
+      },
+      error: (err) => {
+        this.translating.set(false);
+        this.toasts.show(errorMessage(err), 'error');
+      },
+    });
+  }
+
+  /**
+   * Após salvar, a fila traduz EN/ES em alguns segundos: recarrega as traduções
+   * (só se ninguém começou a editar de novo nesse meio tempo).
+   */
+  private refreshTranslationsSoon(id: number, attempt = 0): void {
+    setTimeout(() => {
+      if (this.hasUnsavedChanges() || this.artworkId() !== id) return;
+      this.api.artwork(id).subscribe((a) => {
+        if (this.hasUnsavedChanges()) return;
+        const pending = Object.entries(a.translation_states).some(([l, s]) => l !== 'pt-BR' && s === 'missing');
+        this.fill(a);
+        if (pending && attempt < 3) this.refreshTranslationsSoon(id, attempt + 1);
+      });
+    }, 4000);
   }
 
   protected remove(): void {

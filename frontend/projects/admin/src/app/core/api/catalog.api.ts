@@ -12,6 +12,10 @@ import {
   Page,
   Taxonomy,
   TaxonomyKind,
+  TranslatableType,
+  TranslationItem,
+  TranslationProgress,
+  TranslationState,
 } from './models';
 
 export interface ArtworkFilters {
@@ -79,6 +83,24 @@ export class CatalogApi {
 
   deleteArtwork(id: number): Observable<void> {
     return this.http.delete<void>(this.url(`artworks/${id}`));
+  }
+
+  // Traduções
+  translations(filters: { locale: Locale; type?: TranslatableType | ''; state?: TranslationState | ''; q?: string }): Observable<TranslationItem[]> {
+    let params = new HttpParams();
+    for (const [key, value] of Object.entries(filters)) {
+      if (value) params = params.set(key, String(value));
+    }
+    return this.http.get<{ data: TranslationItem[] }>(this.url('translations'), { params }).pipe(map((r) => r.data));
+  }
+
+  translationProgress(): Observable<Partial<Record<Locale, TranslationProgress>>> {
+    return this.http.get<{ data: Partial<Record<Locale, TranslationProgress>> }>(this.url('translations/progress')).pipe(map((r) => r.data));
+  }
+
+  /** Gera (ou refaz) a tradução automática de um idioma, sobrescrevendo-o. */
+  autoTranslate(type: TranslatableType, id: number, locale: Locale): Observable<void> {
+    return this.http.post<void>(this.url(`translations/${type}/${id}/${locale}/auto`), {});
   }
 
   // Mídia

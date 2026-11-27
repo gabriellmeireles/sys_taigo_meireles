@@ -58,14 +58,14 @@ class ArtworkController extends Controller
 
     public function store(SaveArtworkRequest $request): JsonResponse
     {
-        $artwork = $this->writer->save(null, $request->validated());
+        $artwork = $this->writer->save(null, $request->validated(), $request->user());
 
         return (new ArtworkResource($artwork))->response()->setStatusCode(201);
     }
 
     public function update(SaveArtworkRequest $request, Artwork $artwork): ArtworkResource
     {
-        return new ArtworkResource($this->writer->save($artwork, $request->validated()));
+        return new ArtworkResource($this->writer->save($artwork, $request->validated(), $request->user()));
     }
 
     /** Troca rápida de status na lista. */

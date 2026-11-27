@@ -134,5 +134,28 @@ export interface ArtworkPayload {
   translations: Partial<Record<Locale, ArtworkTranslation>>;
 }
 
+export type TranslatableType = 'artwork' | 'series' | 'technique' | 'category';
+
+export interface TranslationItem {
+  type: TranslatableType;
+  type_label: string;
+  id: number;
+  title: string;
+  translated_title: string | null;
+  locale: Locale;
+  state: TranslationState;
+  auto: boolean;
+  updated_at: string | null;
+}
+
+export interface TranslationProgress {
+  manual: number;
+  auto: number;
+  outdated: number;
+  missing: number;
+  total: number;
+  reviewed_percent: number;
+}
+
 /** Erros de validação do Laravel (422): { campo: [mensagens] }. */
 export type FieldErrors = Record<string, string[]>;

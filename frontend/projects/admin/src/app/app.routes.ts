@@ -55,6 +55,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/artworks/artwork-editor-page').then((m) => m.ArtworkEditorPage),
       },
       {
+        path: 'traducoes',
+        title: t('Traduções'),
+        loadComponent: () => import('./features/translations/translations-page').then((m) => m.TranslationsPage),
+      },
+      {
         path: 'series',
         title: t('Séries'),
         data: { kind: 'series', title: 'Séries', noun: 'série' },

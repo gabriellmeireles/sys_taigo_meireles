@@ -242,6 +242,41 @@ body {
   }
 }
 
+.adm-filters--4 {
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 2fr);
+  }
+}
+
+.adm-progress-grid {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .adm-panel + .adm-panel {
+    margin-top: 0;
+  }
+}
+
+.adm-progress-title {
+  margin-bottom: var(--space-4);
+  font-size: var(--fs-h4) !important;
+}
+
+// Aviso de estado da tradução no editor
+.adm-translation-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
 // Tabela de dados (vira cartões no celular)
 .adm-table {
   width: 100%;

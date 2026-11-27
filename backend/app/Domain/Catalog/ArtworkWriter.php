@@ -2,6 +2,8 @@
 
 namespace App\Domain\Catalog;
 
+use App\Domain\Localization\TranslationSync;
+use App\Models\Admin;
 use App\Models\Artwork;
 use App\Models\ArtworkImage;
 use App\Models\ArtworkStatus;
@@ -21,11 +23,11 @@ class ArtworkWriter
         'seo_title', 'seo_description', 'og_title', 'og_description',
     ];
 
-    public function __construct(private Slugger $slugger) {}
+    public function __construct(private Slugger $slugger, private TranslationSync $translations) {}
 
-    public function save(?Artwork $artwork, array $data): Artwork
+    public function save(?Artwork $artwork, array $data, ?Admin $by = null): Artwork
     {
-        return DB::transaction(function () use ($artwork, $data) {
+        return DB::transaction(function () use ($artwork, $data, $by) {
             $artwork ??= new Artwork();
 
             $attributes = Arr::only($data, [
@@ -41,9 +43,18 @@ class ArtworkWriter
 
             $artwork->fill($attributes)->save();
 
-            foreach ($data['translations'] ?? [] as $locale => $values) {
-                $this->saveTranslation($artwork, $locale, (array) $values);
+            // Origem primeiro; depois os outros idiomas que a pessoa realmente alterou
+            $incoming = $data['translations'] ?? [];
+            if (isset($incoming[Locale::SOURCE])) {
+                $this->saveTranslation($artwork, Locale::SOURCE, (array) $incoming[Locale::SOURCE]);
             }
+            foreach ($incoming as $locale => $values) {
+                if ($locale !== Locale::SOURCE && $this->saveTranslation($artwork, $locale, (array) $values)) {
+                    $this->translations->markReviewed($artwork, $locale, $by);
+                }
+            }
+            // Idiomas sem tradução ou automáticos são (re)traduzidos; revisados ficam desatualizados
+            $this->translations->sourceSaved($artwork);
 
             if (array_key_exists('images', $data)) {
                 $this->syncImages($artwork, $data['images']);
@@ -71,21 +82,43 @@ class ArtworkWriter
         });
     }
 
-    private function saveTranslation(Artwork $artwork, string $locale, array $values): void
+    /** Grava um idioma; devolve false quando nada mudou (mantém o estado da tradução). */
+    private function saveTranslation(Artwork $artwork, string $locale, array $values): bool
     {
         $title = trim((string) ($values['title'] ?? ''));
         if ($title === '') {
-            return; // sem título não há tradução (o idioma cai para o de origem)
+            return false; // sem título não há tradução (o idioma cai para o de origem)
         }
 
         $fields = Arr::only($values, self::TRANSLATABLE);
         $fields['title'] = $title;
+        $requestedSlug = trim((string) ($values['slug'] ?? ''));
+
+        $existing = DB::table('artwork_translations')
+            ->where('artwork_id', $artwork->getKey())->where('locale_code', $locale)->first();
+        if ($existing && $this->sameValues($existing, $fields) && ($requestedSlug === '' || $requestedSlug === $existing->slug)) {
+            return false;
+        }
+
         $fields['slug'] = $this->slugger->unique(
             'artwork_translations', 'artwork_id', $artwork->getKey(), $locale,
-            trim((string) ($values['slug'] ?? '')) ?: $title, 220,
+            $requestedSlug ?: ($existing && $existing->title === $title ? $existing->slug : $title), 220,
         );
 
         $artwork->saveTranslation($locale, $fields, 'manual');
+
+        return true;
+    }
+
+    private function sameValues(object $row, array $fields): bool
+    {
+        foreach ($fields as $field => $value) {
+            if (trim((string) ($row->{$field} ?? '')) !== trim((string) ($value ?? ''))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /** @param array<int, array{media_file_id:int, is_primary?:bool}> $images na ordem desejada */

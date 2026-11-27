@@ -1,0 +1,90 @@
+<div class="adm-page-head">
+  <div class="ui-stack" style="--stack-gap: var(--space-2)">
+    <span class="ui-eyebrow">Idiomas</span>
+    <h1>Traduções</h1>
+    <p class="ui-body-sm ui-muted">O português é a origem. Inglês e espanhol recebem tradução automática, que deve ser revisada.
+      Nomes de séries, técnicas e categorias são traduzidos à mão.</p>
+  </div>
+</div>
+
+<div class="adm-progress-grid">
+  @for (l of targets; track l) {
+    @if (progress()[l]; as p) {
+      <section class="adm-panel">
+        <h2 class="adm-progress-title">{{ localeLabels[l] }} · {{ p.reviewed_percent }}% revisado</h2>
+        <ui-progress [value]="p.reviewed_percent" [label]="'Progresso da revisão em ' + localeLabels[l]" />
+        <p class="ui-caption" style="margin-top: var(--space-3)">
+          {{ p.manual }} revisadas · {{ p.auto }} automáticas · {{ p.outdated }} desatualizadas · {{ p.missing }} ausentes
+        </p>
+      </section>
+    }
+  }
+</div>
+
+<form class="adm-filters adm-filters--4" [formGroup]="filters" (submit)="$event.preventDefault()" role="search">
+  <ui-form-field label="Idioma">
+    <select uiInput formControlName="locale">
+      @for (l of targets; track l) { <option [value]="l">{{ localeLabels[l] }}</option> }
+    </select>
+  </ui-form-field>
+  <ui-form-field label="Estado">
+    <select uiInput formControlName="state">
+      @for (s of states; track s.value) { <option [value]="s.value">{{ s.label }}</option> }
+    </select>
+  </ui-form-field>
+  <ui-form-field label="Tipo">
+    <select uiInput formControlName="type">
+      @for (t of types; track t.value) { <option [value]="t.value">{{ t.label }}</option> }
+    </select>
+  </ui-form-field>
+  <ui-form-field label="Buscar">
+    <input uiInput type="search" formControlName="q" placeholder="Título em português" />
+  </ui-form-field>
+</form>
+
+<section aria-live="polite">
+  @if (error()) {
+    <ui-state kind="error" [title]="error()!">
+      <button uiButton="secondary" type="button" (click)="reload()">Tentar novamente</button>
+    </ui-state>
+  } @else if (items() === null) {
+    <div class="adm-panel"><ui-skeleton shape="text" [lines]="8" /></div>
+  } @else if (items()!.length === 0) {
+    <ui-state title="Nada por aqui com esses filtros." />
+  } @else {
+    <table class="adm-table">
+      <caption class="ui-visually-hidden">Traduções em {{ localeLabels[filters.getRawValue().locale] }}</caption>
+      <thead>
+        <tr>
+          <th scope="col">Tipo</th>
+          <th scope="col">Português</th>
+          <th scope="col">Tradução</th>
+          <th scope="col">Estado</th>
+          <th scope="col"><span class="ui-visually-hidden">Ações</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of items(); track item.type + item.id) {
+          <tr>
+            <td data-label="Tipo" class="ui-muted">{{ item.type_label }}</td>
+            <td>{{ item.title }}</td>
+            <td data-label="Tradução">{{ item.translated_title ?? '—' }}</td>
+            <td><ui-translation-badge [state]="item.state" /></td>
+            <td>
+              <span class="ui-cluster" style="--cluster-gap: var(--space-4); justify-content: flex-end">
+                @if (item.auto && (item.state === 'missing' || item.state === 'outdated')) {
+                  <button uiButton="link" type="button" [disabled]="isWorking(item)" (click)="generate(item)">
+                    {{ isWorking(item) ? 'Traduzindo…' : (item.state === 'missing' ? 'Gerar automática' : 'Retraduzir') }}
+                  </button>
+                }
+                <a uiButton="link" [routerLink]="reviewLink(item).path" [queryParams]="reviewLink(item).query">
+                  {{ item.state === 'manual' ? 'Abrir' : 'Revisar' }}
+                </a>
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

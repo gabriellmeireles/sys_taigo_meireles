@@ -197,4 +197,4 @@ O manual confirma a paleta (§5.1, com valores CMYK para impressos) e a tipograf
 
 **Ícones**: `favicon.svg` (mão em `#262626`, branca em tema escuro do navegador), `favicon.ico` (16/32/48), `apple-touch-icon.png` (180) e `icon-512.png` (mão branca sobre `#262626`).
 
-Vitrine para revisão visual: `http://localhost:4200/design-system` (provisória; sai do site antes da publicação). Classes utilitárias: `ui-container`, `ui-grid`, `ui-section`, `ui-stack`, `ui-cluster`, `ui-artwork-grid`, `ui-eyebrow`, `ui-display`, `ui-prose`, `ui-on-dark`, `ui-visually-hidden`, `ui-skip-link`, `ui-check`, `ui-switch`.
+Vitrine para revisão visual: `http://localhost:4200/design-system` (provisória; sai do site antes da publicação). Classes utilitárias: `ui-container`, `ui-grid`, `ui-section`, `ui-stack`, `ui-cluster`, `ui-artwork-grid`, `ui-eyebrow`, `ui-display`, `ui-prose`, `ui-on-dark`, `ui-visually-hidden`, `ui-skip-link`, `ui-check` (caixa de seleção e opção única), `ui-toggle` (interruptor liga/desliga: checkbox nativo com `role="switch"`, trilho e texto "Ligado/Desligado" vindo de `data-on`/`data-off`).
